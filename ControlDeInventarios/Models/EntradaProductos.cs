@@ -18,7 +18,7 @@ namespace ControlDeInventarios.Models
 
         public DateTime Fecha { get; set; } = DateTime.Now;
 
-        public string? UsuarioId { get; set; }
+        public int? UsuarioId { get; set; }
 
         [ForeignKey("UsuarioId")]
         public Usuario? Usuario { get; set; }
