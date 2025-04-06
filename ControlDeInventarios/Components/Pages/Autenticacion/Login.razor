@@ -6,6 +6,8 @@
 @inject NavigationManager Navigation
 @inject AuthService AuthService
 @inject CustomAuthProvider AuthProvider
+@rendermode InteractiveServer
+
 
 
 <h3 class="text-center mt-4">Iniciar Sesión</h3>
@@ -15,7 +17,7 @@
     <div class="alert alert-danger text-center">@errorMessage</div>
 }
 
-<EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
+<EditForm Model="@loginModel" OnValidSubmit="HandleLogin" FormName="loginForm">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
