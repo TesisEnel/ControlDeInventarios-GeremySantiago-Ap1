@@ -1,0 +1,56 @@
+﻿@page "/Categorias/CategoriaForm/{Id:int?}"
+@inject CategoriaService categoriaService
+@inject NavigationManager Navigation
+@using System.ComponentModel.DataAnnotations
+@*@attribute [Authorize(Roles = "Admin")]*@
+
+<h3 class="text-center mt-4">@((Id == 0) ? "Agregar Categoría" : "Editar Categoría")</h3>
+
+<EditForm Model="@categoria" OnValidSubmit="GuardarCategoria" FormName="categoriaForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <InputText class="form-control" @bind-Value="categoria.Nombre" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Descripción</label>
+        <InputText class="form-control" @bind-Value="categoria.Descripcion" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Categorias categoria = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != 0)
+        {
+            var catExistente = await categoriaService.ObtenerPorIdAsync(Id);
+            if (catExistente != null)
+                categoria = catExistente;
+        }
+    }
+
+    private async Task GuardarCategoria()
+    {
+        if (Id == 0)
+            await categoriaService.AgregarAsync(categoria);
+        else
+            await categoriaService.ActualizarAsync(categoria);
+
+        Navigation.NavigateTo("/Categorias/CategoriasList");
+    }
+
+    private void Cancelar()
+    {
+        Navigation.NavigateTo("/CategoriaForm/CategoriasList");
+    }
+}

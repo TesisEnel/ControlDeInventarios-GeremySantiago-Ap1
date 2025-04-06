@@ -1,0 +1,73 @@
+﻿@page "/Categorias/CategoriasList"
+@inject CategoriaService categoriaService
+@inject NavigationManager Navigation
+@using System.ComponentModel.DataAnnotations
+@*@attribute [Authorize]*@
+@inject IJSRuntime JS
+
+<h3 class="text-center mt-4">Listado de Categorías</h3>
+
+@if (categorias is null)
+{
+    <p class="text-center">Cargando categorías...</p>
+}
+else if (!categorias.Any())
+{
+    <p class="text-center text-muted">No hay categorías registradas.</p>
+}
+else
+{
+    <table class="table table-bordered table-striped mt-4">
+        <thead class="table-dark">
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cat in categorias)
+            {
+                <tr>
+                    <td>@cat.Nombre</td>
+                    <td>@cat.Descripcion</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning me-2" @onclick="() => EditarCategoria(cat.Id)">Editar</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => EliminarCategoria(cat.Id)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<button class="btn btn-primary mt-3" @onclick="NuevaCategoria">Agregar Categoría</button>
+
+@code {
+    private List<Categorias> categorias;
+
+    protected override async Task OnInitializedAsync()
+    {
+        categorias = await categoriaService.ObtenerTodasAsync();
+    }
+
+    private void NuevaCategoria()
+    {
+        Navigation.NavigateTo("/Categorias/CategoriaForm");
+    }
+
+    private void EditarCategoria(int id)
+    {
+        Navigation.NavigateTo($"/CategoriaForm/{id}");
+    }
+
+    private async Task EliminarCategoria(int id)
+    {
+        bool confirmado = await JS.InvokeAsync<bool>("confirm", "¿Estás seguro de eliminar esta categoría?");
+        if (confirmado)
+        {
+            await categoriaService.EliminarAsync(id);
+            categorias = await categoriaService.ObtenerTodasAsync();
+        }
+    }
+}
