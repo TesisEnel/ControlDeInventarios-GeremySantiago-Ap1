@@ -1,0 +1,46 @@
+﻿@page "/Productos/ProductoDetalle/{Id:int?}"
+@inject ProductosService productoService
+@inject NavigationManager Navigation
+@using System.ComponentModel.DataAnnotations
+
+<h3 class="text-center mt-4">Detalle del Producto</h3>
+
+@if (producto == null)
+{
+    <p class="text-center">Cargando detalles del producto...</p>
+}
+else
+{
+    <div class="card mt-4 mx-auto" style="max-width: 500px;">
+        <div class="card-body">
+            @if (!string.IsNullOrEmpty(producto.ImagenUrl))
+            {
+                <div class="text-center mb-3">
+                    <img src="@producto.ImagenUrl" alt="Imagen del producto" class="img-fluid rounded" style="max-height: 250px;" />
+                </div>
+            }
+            <h4 class="card-title">@producto.Nombre</h4>
+            <p class="card-text"><strong>Descripción:</strong> @producto.Descripcion</p>
+            <p class="card-text"><strong>Categoría:</strong> @producto.Categorias</p>
+            <p class="card-text"><strong>Precio Compra:</strong> $@producto.PrecioCompra</p>
+            <p class="card-text"><strong>Precio Venta:</strong> $@producto.PrecioVenta</p>
+            <p class="card-text"><strong>Stock:</strong> @producto.Stock</p>
+            <button class="btn btn-secondary mt-3" @onclick="Volver">Volver</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Productos? producto;
+
+    protected override async Task OnInitializedAsync()
+    {
+        producto = await productoService.ObtenerPorIdAsync(Id);
+    }
+
+    private void Volver()
+    {
+        Navigation.NavigateTo("/Productos/ProductosList");
+    }
+}

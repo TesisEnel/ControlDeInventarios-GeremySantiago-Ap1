@@ -1,0 +1,59 @@
+﻿@page "/Productos/AlertaStock"
+@inject ProductosService productoService
+@inject NavigationManager Navigation
+@using System.ComponentModel.DataAnnotations
+
+<h3 class="text-center mt-4 text-danger">Productos con Bajo Stock</h3>
+
+@if (productosBajoStock is null)
+{
+    <p class="text-center">Cargando productos...</p>
+}
+else if (!productosBajoStock.Any())
+{
+    <p class="text-center text-muted">No hay productos con bajo stock.</p>
+}
+else
+{
+    <table class="table table-bordered table-striped mt-4">
+        <thead class="table-danger">
+            <tr>
+                <th>Producto</th>
+                <th>Stock</th>
+                <th>Categoría</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var producto in productosBajoStock)
+            {
+                <tr>
+                    <td>@producto.Nombre</td>
+                    <td class="fw-bold text-danger">@producto.Stock</td>
+                    <td>@producto.Categorias?.Nombre</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="text-center mt-4">
+        <button class="btn btn-secondary" @onclick="VerTodosLosProductos">
+            <i class="oi oi-box"></i> Ver todos los productos
+        </button>
+    </div>
+}
+
+@code {
+    private List<Productos>? productosBajoStock;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var todos = await productoService.ObtenerTodosAsync();
+        productosBajoStock = todos.Where(p => p.Stock <= 5).ToList();
+    }
+
+    private void VerTodosLosProductos()
+    {
+        Navigation.NavigateTo("/Productos/ProductosList");
+    }
+}
+

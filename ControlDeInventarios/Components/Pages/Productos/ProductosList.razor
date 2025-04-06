@@ -1,0 +1,93 @@
+﻿@page "/Productos/ProductosList"
+@inject ProductosService productoService
+@inject NavigationManager Navigation
+@using System.ComponentModel.DataAnnotations
+@inject IJSRuntime JS
+
+<h3 class="text-center mt-4">Listado de Productos</h3>
+
+@if (productos is null)
+{
+    <p class="text-center">Cargando productos...</p>
+}
+else if (!productos.Any())
+{
+    <p class="text-center text-muted">No hay productos registrados.</p>
+}
+else
+{
+    <table class="table table-bordered table-striped mt-4">
+        <thead class="table-dark">
+            <tr>
+                <th>Imagen</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Categoría</th>
+                <th>Precio Compra</th>
+                <th>Precio Venta</th>
+                <th>Stock</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in productos)
+            {
+                <tr>
+                    <td>
+                        @if (!string.IsNullOrEmpty(p.ImagenUrl))
+                        {
+                            <img src="@p.ImagenUrl" alt="Imagen" style="height: 60px; width: 60px; object-fit: cover;" class="rounded" />
+                        }
+                    </td>
+                    <td>@p.Nombre</td>
+                    <td>@p.Descripcion</td>
+                    <td>@p.Categorias</td>
+                    <td>$@p.PrecioCompra</td>
+                    <td>$@p.PrecioVenta</td>
+                    <td>@p.Stock</td>
+                    <td>
+                        <button class="btn btn-sm btn-info me-2" @onclick="() => VerDetalle(p.Id)">Ver</button>
+                        <button class="btn btn-sm btn-warning me-2" @onclick="() => EditarProducto(p.Id)">Editar</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => EliminarProducto(p.Id)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<button class="btn btn-primary mt-3" @onclick="NuevoProducto">Agregar Producto</button>
+
+@code {
+    private List<Productos> productos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        productos = await productoService.ObtenerTodosAsync();
+    }
+
+    private void NuevoProducto()
+    {
+        Navigation.NavigateTo("/Productos/ProductoForm");
+    }
+
+    private void EditarProducto(int id)
+    {
+        Navigation.NavigateTo($"/ProductoForm/{id}");
+    }
+
+    private void VerDetalle(int id)
+    {
+        Navigation.NavigateTo($"/ProductoDetalle/{id}");
+    }
+
+    private async Task EliminarProducto(int id)
+    {
+        bool confirmado = await JS.InvokeAsync<bool>("confirm", "¿Estás seguro de eliminar este producto?");
+        if (confirmado)
+        {
+            await productoService.EliminarAsync(id);
+            productos = await productoService.ObtenerTodosAsync();
+        }
+    }
+}

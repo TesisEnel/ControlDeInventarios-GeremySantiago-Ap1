@@ -1,0 +1,112 @@
+﻿@page "/Productos/ProductoForm/{Id:int?}"
+@inject ProductosService productoService
+@inject CategoriaService categoriaService
+@inject NavigationManager Navigation
+@using System.ComponentModel.DataAnnotations
+@*@attribute [Authorize(Roles = "Admin")] // Solo Admin puede *@
+@inject IJSRuntime JS
+
+<h3 class="text-center mt-4">@((Id == 0) ? "Agregar Producto" : "Editar Producto")</h3>
+
+<EditForm Model="@producto" OnValidSubmit="GuardarProducto" FormName="productoForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <InputText class="form-control" @bind-Value="producto.Nombre" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Descripción</label>
+        <InputText class="form-control" @bind-Value="producto.Descripcion" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Categoría</label>
+        <InputSelect class="form-control" @bind-Value="producto.CategoriaId">
+            <option disabled value="">Seleccione una categoría</option>
+            @foreach (var cat in categorias)
+            {
+                <option value="@cat.Id">@cat.Nombre</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Precio Compra</label>
+        <InputNumber class="form-control" @bind-Value="producto.PrecioCompra" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Precio Venta</label>
+        <InputNumber class="form-control" @bind-Value="producto.PrecioVenta" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Stock</label>
+        <InputNumber class="form-control" @bind-Value="producto.Stock" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Imagen del Producto</label>
+        <InputFile OnChange="OnInputFileChange" />
+        @if (!string.IsNullOrEmpty(previewUrl))
+        {
+            <div class="mt-2">
+                <img src="@previewUrl" alt="Vista previa" class="img-thumbnail" style="max-height: 200px;" />
+            </div>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Productos producto = new();
+    private List<Categorias> categorias = new();
+    private string previewUrl;
+
+    protected override async Task OnInitializedAsync()
+    {
+        categorias = await categoriaService.ObtenerTodasAsync();
+
+        if (Id != 0)
+        {
+            var prodExistente = await productoService.ObtenerPorIdAsync(Id);
+            if (prodExistente != null)
+                producto = prodExistente;
+        }
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        using var stream = file.OpenReadStream();
+        using var ms = new MemoryStream();
+        await stream.CopyToAsync(ms);
+        var bytes = ms.ToArray();
+
+        producto.ImagenUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(bytes)}";
+        previewUrl = producto.ImagenUrl;
+    }
+
+    private async Task GuardarProducto()
+    {
+        if (Id == 0)
+            await productoService.AgregarAsync(producto);
+        else
+            await productoService.ActualizarAsync(producto);
+
+        Navigation.NavigateTo("/Productos/ProductosList");
+    }
+
+    private void Cancelar()
+    {
+        Navigation.NavigateTo("/Productos/ProductosList");
+    }
+}
