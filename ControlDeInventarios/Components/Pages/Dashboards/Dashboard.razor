@@ -1,0 +1,96 @@
+﻿@page "/Dashboards/Dashboard"
+@inject ProductosService productoService
+@inject EntradaService entradaService
+@inject SalidaService salidaService
+@inject NavigationManager Navigation
+@using System.ComponentModel.DataAnnotations
+@*@attribute [Authorize]*@
+@implements IDisposable
+
+<h3 class="text-center mt-3">Bienvenido al Sistema de Inventario</h3>
+
+@if (cargando)
+{
+    <div class="text-center text-muted">Actualizando...</div>
+}
+
+<div class="d-flex justify-content-center gap-4 mt-4 flex-wrap">
+    <div class="card text-white bg-primary" style="width: 160px;">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
+            <h5 class="card-title">Productos</h5>
+            <h2>@totalProductos</h2>
+            <button class="btn btn-light" @onclick="@(() => Navigation.NavigateTo("/Productos/ProductosList"))">Ver productos</button>
+        </div>
+    </div>
+
+    <div class="card text-white bg-success" style="width: 160px;">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
+            <h5 class="card-title">Entradas</h5>
+            <h2>@totalEntradas</h2>
+            <button class="btn btn-light" @onclick="@(() => Navigation.NavigateTo("/EntradasList"))">Ver entradas</button>
+        </div>
+    </div>
+
+    <div class="card text-white bg-danger" style="width: 160px;">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
+            <h5 class="card-title">Salidas</h5>
+            <h2>@totalSalidas</h2>
+            <button class="btn btn-light" @onclick="@(() => Navigation.NavigateTo("/SalidasList"))">Ver salidas</button>
+        </div>
+    </div>
+</div>
+
+@if (productosConBajoStock.Count > 0)
+{
+    <h4 class="mt-5 text-danger">⚠ Productos con bajo stock</h4>
+    <ul>
+        @foreach (var p in productosConBajoStock)
+        {
+            <li>@p.Nombre - Stock: @p.Stock</li>
+        }
+    </ul>
+}
+
+@code {
+    private int totalProductos;
+    private int totalEntradas;
+    private int totalSalidas;
+    private List<Productos> productosConBajoStock = new();
+    private Timer? _timer;
+    private bool cargando = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarDatosAsync();
+
+        // Refrescar cada 10 segundos
+        _timer = new Timer(async _ =>
+        {
+            await InvokeAsync(async () => await CargarDatosAsync());
+        }, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
+    }
+
+    private async Task CargarDatosAsync()
+    {
+        cargando = true;
+        StateHasChanged();
+
+        var productos = await productoService.ObtenerTodosAsync();
+        var entradas = await entradaService.ObtenerTodasAsync();
+        var salidas = await salidaService.ObtenerTodasAsync();
+
+        totalProductos = productos.Count;
+        totalEntradas = entradas.Count;
+        totalSalidas = salidas.Count;
+
+        productosConBajoStock = productos.Where(p => p.Stock <= 5).ToList();
+
+        cargando = false;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+}
