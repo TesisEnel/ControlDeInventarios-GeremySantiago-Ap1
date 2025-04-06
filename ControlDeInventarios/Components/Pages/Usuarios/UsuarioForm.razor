@@ -1,0 +1,69 @@
+﻿@page "/Usuarios/UsuarioForm/{id:int?}"
+@inject UsuarioService usuarioService
+@inject NavigationManager Navigation
+@using System.ComponentModel.DataAnnotations
+
+<h3 class="text-center mt-4">@((usuario.Id == 0) ? "Registrar Usuario" : "Editar Usuario")</h3>
+
+<EditForm Model="@usuario" OnValidSubmit="GuardarUsuario">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <InputText class="form-control" @bind-Value="usuario.Nombre" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Correo</label>
+        <InputText class="form-control" @bind-Value="usuario.Correo" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Contraseña</label>
+        <InputText class="form-control" type="password" @bind-Value="usuario.Clave" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Rol</label>
+        <InputSelect class="form-control" @bind-Value="usuario.Rol">
+            <option value="">Seleccione un rol</option>
+            <option value="Admin">Admin</option>
+            <option value="Usuario">Usuario</option>
+        </InputSelect>
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    private Usuario usuario = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id.HasValue)
+        {
+            var existente = await usuarioService.ObtenerPorIdAsync(Id.Value);
+            if (existente != null)
+                usuario = existente;
+        }
+    }
+
+    private async Task GuardarUsuario()
+    {
+        if (usuario.Id == 0)
+            await usuarioService.AgregarAsync(usuario);
+        else
+            await usuarioService.EditarAsync(usuario);
+
+        Navigation.NavigateTo("/Usuarios/UsuariosList");
+    }
+
+    private void Cancelar()
+    {
+        Navigation.NavigateTo("/Usuarios/UsuariosList");
+    }
+}
+
