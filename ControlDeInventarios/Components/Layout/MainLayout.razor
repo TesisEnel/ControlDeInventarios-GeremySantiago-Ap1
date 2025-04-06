@@ -1,23 +1,52 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<div class="d-flex">
+    <NavMenu />
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+    <div class="main-content">
+        <header class="top-bar d-flex justify-content-between align-items-center px-4 py-2 bg-white border-bottom">
+            <h5 class="m-0">Sistema de Inventario</h5>
+            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">Ayuda</a>
+        </header>
 
-        <article class="content px-4">
+        <div class="content p-4">
             @Body
-        </article>
-    </main>
+        </div>
+    </div>
 </div>
 
 <div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
+    Ha ocurrido un error inesperado.
+    <a href="." class="reload">Recargar</a>
     <span class="dismiss">🗙</span>
 </div>
+
+<style>
+    .d-flex {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        width: 220px;
+        background-color: #f8f9fa;
+        border-right: 1px solid #dee2e6;
+    }
+
+    .main-content {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .top-bar {
+        background-color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .content {
+        flex-grow: 1;
+        padding: 1.5rem;
+    }
+</style>
+
