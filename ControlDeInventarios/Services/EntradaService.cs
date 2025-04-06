@@ -35,4 +35,23 @@ public class EntradaService
         await context.Entradas.AddAsync(entrada);
         await context.SaveChangesAsync();
     }
+
+    public async Task EliminarAsync(int id)
+    {
+        using var context = _dbFactory.CreateDbContext();
+
+        var entrada = await context.Entradas.FindAsync(id);
+        if (entrada != null)
+        {
+            var producto = await context.Productos.FindAsync(entrada.ProductoId);
+            if (producto != null)
+            {
+                producto.Stock -= entrada.Cantidad; // Revertir stock
+            }
+
+            context.Entradas.Remove(entrada);
+            await context.SaveChangesAsync();
+        }
+    }
+
 }

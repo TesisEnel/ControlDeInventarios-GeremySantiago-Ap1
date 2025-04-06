@@ -6,33 +6,47 @@ namespace ControlDeInventarios.Services;
 
 public class UsuarioService
 {
-    private readonly IDbContextFactory<Contexto> _dbFactory;
+    private readonly IDbContextFactory<Contexto> _contextoFactory;
 
     public UsuarioService(IDbContextFactory<Contexto> dbFactory)
     {
-        _dbFactory = dbFactory;
+        _contextoFactory = dbFactory;
     }
 
-    public async Task<List<Usuario>> ObtenerUsuariosAsync()
+    public async Task<List<Usuario>> ObtenerTodosAsync()
     {
-        using var context = _dbFactory.CreateDbContext();
+        using var context = _contextoFactory.CreateDbContext();
         return await context.Usuario.ToListAsync();
     }
 
-    public async Task<Usuario?> ObtenerUsuarioPorIdAsync(string id)
+    public async Task<Usuario?> ObtenerPorIdAsync(int id)
     {
-        using var context = _dbFactory.CreateDbContext();
+        using var context = _contextoFactory.CreateDbContext();
         return await context.Usuario.FindAsync(id);
     }
 
-    public async Task<bool> EliminarUsuarioAsync(string id)
+    public async Task EliminarAsync(int id)
     {
-        using var context = _dbFactory.CreateDbContext();
+        using var context = _contextoFactory.CreateDbContext();
         var user = await context.Usuario.FindAsync(id);
-        if (user == null) return false;
+        if (user != null)
+        {
+            context.Usuario.Remove(user);
+            await context.SaveChangesAsync();
+        }
+    }
 
-        context.Usuario.Remove(user);
+    public async Task AgregarAsync(Usuario usuario)
+    {
+        using var context = _contextoFactory.CreateDbContext();
+        context.Usuario.Add(usuario);
         await context.SaveChangesAsync();
-        return true;
+    }
+
+    public async Task EditarAsync(Usuario usuario)
+    {
+        using var context = _contextoFactory.CreateDbContext();
+        context.Usuario.Update(usuario);
+        await context.SaveChangesAsync();
     }
 }

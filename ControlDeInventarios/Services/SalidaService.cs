@@ -2,40 +2,60 @@
 using ControlDeInventarios.DAL;
 using Microsoft.EntityFrameworkCore;
 
-namespace ControlDeInventarios.Services
+namespace ControlDeInventarios.Services;
+
+public class SalidaService
 {
-    public class SalidaService
+    private readonly IDbContextFactory<Contexto> _dbFactory;
+
+    public SalidaService(IDbContextFactory<Contexto> dbFactory)
     {
-        private readonly IDbContextFactory<Contexto> _dbFactory;
+        _dbFactory = dbFactory;
+    }
 
-        public SalidaService(IDbContextFactory<Contexto> dbFactory)
+    public async Task<List<SalidaProductos>> ObtenerTodasAsync()
+    {
+        using var context = _dbFactory.CreateDbContext();
+        return await context.Salidas
+            .Include(s => s.Productos)
+            .Include(s => s.Usuario)
+            .ToListAsync();
+    }
+
+    public async Task AgregarAsync(SalidaProductos salida)
+    {
+        using var context = _dbFactory.CreateDbContext();
+
+        var producto = await context.Productos.FindAsync(salida.ProductoId);
+        if (producto != null)
         {
-            _dbFactory = dbFactory;
+            if (producto.Stock < salida.Cantidad)
+                throw new InvalidOperationException("No hay suficiente stock para realizar la salida.");
+
+            producto.Stock -= salida.Cantidad;
         }
 
-        public async Task<List<SalidaProductos>> ObtenerTodasAsync()
-        {
-            using var context = _dbFactory.CreateDbContext();
-            return await context.Salidas
-                .Include(s => s.Productos)
-                .Include(s => s.Usuario)
-                .ToListAsync();
-        }
+        await context.Salidas.AddAsync(salida);
+        await context.SaveChangesAsync();
+    }
 
-        public async Task<bool> AgregarAsync(SalidaProductos salida)
-        {
-            using var context = _dbFactory.CreateDbContext();
 
+    public async Task EliminarAsync(int id)
+    {
+        using var context = _dbFactory.CreateDbContext();
+
+        var salida = await context.Salidas.FindAsync(id);
+        if (salida != null)
+        {
             var producto = await context.Productos.FindAsync(salida.ProductoId);
-            if (producto != null && producto.Stock >= salida.Cantidad)
+            if (producto != null)
             {
-                producto.Stock -= salida.Cantidad;
-                await context.Salidas.AddAsync(salida);
-                await context.SaveChangesAsync();
-                return true;
+                producto.Stock += salida.Cantidad; // Revertir stock
             }
 
-            return false;
+            context.Salidas.Remove(salida);
+            await context.SaveChangesAsync();
         }
     }
+
 }

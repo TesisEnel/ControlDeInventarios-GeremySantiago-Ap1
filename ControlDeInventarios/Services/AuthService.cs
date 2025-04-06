@@ -13,14 +13,30 @@ namespace ControlDeInventarios.Services
             _context = context;
         }
 
-        public async Task<Usuario> LoginAsync(string correo, string clave)
+        public async Task<Auth> LoginAsync(string correo, string clave)
         {
-            return await _context.Usuario
+            var usuario = await _context.Usuario
                 .FirstOrDefaultAsync(u => u.Correo == correo && u.Clave == clave);
+
+            if (usuario == null)
+                return new Auth { EstaAutenticado = false };
+
+            return new Auth
+            {
+                UsuarioId = usuario.Id,
+                Nombre = usuario.Nombre,
+                Correo = usuario.Correo,
+                Rol = usuario.Rol,
+                EstaAutenticado = true
+            };
         }
 
         public async Task RegistrarAsync(Usuario usuario)
         {
+            // Opcional: validaciones básicas
+            if (string.IsNullOrWhiteSpace(usuario.Nombre) || string.IsNullOrWhiteSpace(usuario.Correo))
+                throw new ArgumentException("Datos de usuario inválidos");
+
             _context.Usuario.Add(usuario);
             await _context.SaveChangesAsync();
         }
