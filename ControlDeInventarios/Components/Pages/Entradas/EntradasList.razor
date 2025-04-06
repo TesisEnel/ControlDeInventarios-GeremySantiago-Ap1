@@ -1,0 +1,71 @@
+﻿@page "/Entradas/EntradasList"
+@inject EntradaService entradaService
+@inject NavigationManager Navigation
+@using System.ComponentModel.DataAnnotations
+@*@attribute [Authorize]*@
+@inject IJSRuntime JS
+
+<h3 class="text-center mt-4">Listado de Entradas</h3>
+
+@if (entradas is null)
+{
+    <p class="text-center">Cargando entradas...</p>
+}
+else if (!entradas.Any())
+{
+    <p class="text-center text-muted">No hay entradas registradas.</p>
+}
+else
+{
+    <table class="table table-bordered table-striped mt-4">
+        <thead class="table-dark">
+            <tr>
+                <th>Fecha</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Usuario</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entrada in entradas)
+            {
+                <tr>
+                    <td>@entrada.Fecha.ToString("dd/MM/yyyy")</td>
+                    <td>@entrada.Producto?.Nombre</td>
+                    <td>@entrada.Cantidad</td>
+                    <td>@entrada.Usuario?.Nombre</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" @onclick="() => EliminarEntrada(entrada.Id)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<button class="btn btn-primary mt-3" @onclick="NuevaEntrada">Registrar Nueva Entrada</button>
+
+@code {
+    private List<EntradaProductos> entradas;
+
+    protected override async Task OnInitializedAsync()
+    {
+        entradas = await entradaService.ObtenerTodasAsync();
+    }
+
+    private void NuevaEntrada()
+    {
+        Navigation.NavigateTo("/Entradas/EntradaForm");
+    }
+
+    private async Task EliminarEntrada(int id)
+    {
+        bool confirmado = await JS.InvokeAsync<bool>("confirm", "¿Estás seguro de eliminar esta entrada?");
+        if (confirmado)
+        {
+            await entradaService.EliminarAsync(id);
+            entradas = await entradaService.ObtenerTodasAsync();
+        }
+    }
+}
