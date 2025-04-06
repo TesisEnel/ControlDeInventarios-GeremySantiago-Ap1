@@ -1,0 +1,101 @@
+﻿@page "/Autenticacion/Registro"
+@using ControlDeInventarios.Models
+@using ControlDeInventarios.Services
+@using System.ComponentModel.DataAnnotations
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<h3 class="text-center mt-4">Registro de Usuario</h3>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert @mensajeClase text-center">@mensaje</div>
+}
+
+<EditForm Model="@nuevoUsuario" OnValidSubmit="RegistrarUsuario">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label>Nombre</label>
+        <InputText class="form-control" @bind-Value="nuevoUsuario.Nombre" />
+        <ValidationMessage For="@(() => nuevoUsuario.Nombre)" />
+    </div>
+
+    <div class="form-group mt-2">
+        <label>Apellido</label>
+        <InputText class="form-control" @bind-Value="nuevoUsuario.Apellido" />
+        <ValidationMessage For="@(() => nuevoUsuario.Apellido)" />
+    </div>
+
+    <div class="form-group mt-2">
+        <label>Cédula</label>
+        <InputText class="form-control" @bind-Value="nuevoUsuario.Cedula" />
+        <ValidationMessage For="@(() => nuevoUsuario.Cedula)" />
+    </div>
+
+    <div class="form-group mt-2">
+        <label>Correo</label>
+        <InputText class="form-control" @bind-Value="nuevoUsuario.Correo" />
+        <ValidationMessage For="@(() => nuevoUsuario.Correo)" />
+    </div>
+
+    <div class="form-group mt-2">
+        <label>Contraseña</label>
+        <InputText type="password" class="form-control" @bind-Value="nuevoUsuario.Clave" />
+        <ValidationMessage For="@(() => nuevoUsuario.Clave)" />
+    </div>
+
+    <div class="form-group mt-2">
+        <label>Rol</label>
+        <InputSelect class="form-control" @bind-Value="nuevoUsuario.Rol">
+            <option value="">Seleccione un rol</option>
+            <option>Admin</option>
+            <option>Usuario</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => nuevoUsuario.Rol)" />
+    </div>
+
+    <button type="submit" class="btn btn-success w-100 mt-4">Registrarse</button>
+
+    <div class="text-center mt-3">
+        <span>¿Ya tienes cuenta? </span>
+        <a href="/Autenticacion/Login">Iniciar sesión</a>
+    </div>
+</EditForm>
+
+@code {
+    private Usuario nuevoUsuario = new();
+    private string mensaje = "";
+    private string mensajeClase = "";
+
+    private async Task RegistrarUsuario()
+    {
+        try
+        {
+            if (await AuthService.CorreoExisteAsync(nuevoUsuario.Correo))
+            {
+                mensaje = "El correo ya está registrado.";
+                mensajeClase = "alert-danger";
+                return;
+            }
+
+            await AuthService.RegistrarAsync(nuevoUsuario);
+
+            mensaje = "Usuario registrado correctamente.";
+            mensajeClase = "alert-success";
+
+            await Task.Delay(1500);
+            Navigation.NavigateTo("/Autenticacion/Login", true);
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al registrar: {ex.Message}";
+            mensajeClase = "alert-danger";
+        }
+    }
+}
+
+
+<pre>@System.Text.Json.JsonSerializer.Serialize(nuevoUsuario)</pre>
+
