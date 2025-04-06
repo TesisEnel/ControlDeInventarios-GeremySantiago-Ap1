@@ -1,0 +1,66 @@
+﻿@page "/Salidas/NuevaSalida"
+@inject SalidaService salidaService
+@inject ProductosService productoService
+@inject UsuarioService usuarioService
+@inject NavigationManager Navigation
+@using System.ComponentModel.DataAnnotations
+
+<h3 class="text-center mt-4">Registrar Nueva Salida</h3>
+
+<EditForm Model="@salida" OnValidSubmit="GuardarSalida" FormName="salidaForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Producto</label>
+        <InputSelect class="form-control" @bind-Value="salida.ProductoId">
+            <option value="">Seleccione un producto</option>
+            @foreach (var prod in productos)
+            {
+                <option value="@prod.Id">@prod.Nombre</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Cantidad</label>
+        <InputNumber class="form-control" @bind-Value="salida.Cantidad" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Usuario</label>
+        <InputSelect class="form-control" @bind-Value="salida.UsuarioId">
+            <option value="">Seleccione un usuario</option>
+            @foreach (var usr in usuarios)
+            {
+                <option value="@usr.Id">@usr.Nombre</option>
+            }
+        </InputSelect>
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+@code {
+    private SalidaProductos salida = new();
+    private List<Productos> productos = new();
+    private List<Usuario> usuarios = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        productos = await productoService.ObtenerTodosAsync();
+        usuarios = await usuarioService.ObtenerTodosAsync();
+    }
+
+    private async Task GuardarSalida()
+    {
+        await salidaService.AgregarAsync(salida);
+        Navigation.NavigateTo("/Salidas/SalidasList");
+    }
+
+    private void Cancelar()
+    {
+        Navigation.NavigateTo("/Salidas/SalidasList");
+    }
+}
