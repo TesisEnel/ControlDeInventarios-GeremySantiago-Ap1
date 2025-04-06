@@ -1,0 +1,15 @@
+﻿/* Ajustar el contenedor al ancho de la tabla */
+.usuario-contenedor {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 600px auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: inline-block;
+}
+
+/* Centrar la tabla */
+.table {
+    margin: 0 auto;
+    width: auto; /* La tabla se ajustará al contenido */
+}

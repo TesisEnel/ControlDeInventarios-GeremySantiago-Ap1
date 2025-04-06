@@ -1,45 +1,40 @@
 ﻿@page "/Usuarios/UsuariosList"
 @inject UsuarioService usuarioService
 @inject NavigationManager Navigation
-@using System.ComponentModel.DataAnnotations
 @inject IJSRuntime JS
+@using System.ComponentModel.DataAnnotations
 
-<h3 class="text-center mt-4">Listado de Usuarios</h3>
+<div class="d-flex justify-content-center mt-5">
+    <div class="bg-white rounded shadow p-4 d-inline-block">
+        <h4 class="text-center mb-4">Listado de Usuarios</h4>
 
-@if (usuarios is null)
-{
-    <p class="text-center">Cargando usuarios...</p>
-}
-else if (!usuarios.Any())
-{
-    <p class="text-center text-muted">No hay usuarios registrados.</p>
-}
-else
-{
-    <table class="table table-bordered table-striped mt-4">
-        <thead class="table-dark">
-            <tr>
-                <th>Nombre</th>
-                <th>Correo</th>
-                <th>Rol</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in usuarios)
-            {
+        <table class="table table-bordered table-striped m-0">
+            <thead class="table-dark">
                 <tr>
-                    <td>@user.Nombre</td>
-                    <td>@user.Correo</td>
-                    <td>@user.Rol</td>
-                    <td>
-                        <button class="btn btn-sm btn-danger" @onclick="() => EliminarUsuario(user.Id)">Eliminar</button>
-                    </td>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach (var user in usuarios)
+                {
+                    <tr>
+                        <td>@user.Nombre</td>
+                        <td>@user.Correo</td>
+                        <td>@user.Rol</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" @onclick="() => EliminarUsuario(user.Id)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
 
 @code {
     private List<Usuario> usuarios;
