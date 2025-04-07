@@ -32,6 +32,9 @@ builder.Services.AddScoped<CategoriaService>();
 builder.Services.AddScoped<EntradaService>();
 builder.Services.AddScoped<SalidaService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<CustomAuthProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthProvider>();
 
 
 var app = builder.Build();
