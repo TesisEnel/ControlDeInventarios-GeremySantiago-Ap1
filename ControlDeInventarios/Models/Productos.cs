@@ -16,7 +16,7 @@ public class Productos
     public string? ImagenUrl { get; set; }
 
     [Required]
-    public int? CategoriaId { get; set; }
+    public int CategoriaId { get; set; }
 
     [ForeignKey("CategoriaId")]
     public Categorias? Categorias { get; set; }

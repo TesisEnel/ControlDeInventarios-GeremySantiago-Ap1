@@ -6,7 +6,7 @@ public class Categorias
 {
     public int Id { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "El nombre es obligatorio")]
     public string? Nombre { get; set; }
     public string? Descripcion { get; set; }
 
