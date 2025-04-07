@@ -32,9 +32,6 @@ builder.Services.AddScoped<CategoriaService>();
 builder.Services.AddScoped<EntradaService>();
 builder.Services.AddScoped<SalidaService>();
 builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<CustomAuthProvider>();
-builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthProvider>();
-builder.Services.AddAuthorizationCore(); // Necesario para [Authorize]
 
 
 var app = builder.Build();

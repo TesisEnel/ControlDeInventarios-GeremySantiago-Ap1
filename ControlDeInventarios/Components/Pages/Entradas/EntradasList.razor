@@ -2,8 +2,9 @@
 @inject EntradaService entradaService
 @inject NavigationManager Navigation
 @using System.ComponentModel.DataAnnotations
-@*@attribute [Authorize]*@
 @inject IJSRuntime JS
+@rendermode InteractiveServer
+
 
 <h3 class="text-center mt-4">Listado de Entradas</h3>
 
@@ -45,6 +46,7 @@ else
 }
 
 <button class="btn btn-primary mt-3" @onclick="NuevaEntrada">Registrar Nueva Entrada</button>
+<button class="btn btn-secondary mt-3" @onclick="AtrasEntrada">Salir de Registro</button>
 
 @code {
     private List<EntradaProductos> entradas;
@@ -56,7 +58,12 @@ else
 
     private void NuevaEntrada()
     {
-        Navigation.NavigateTo("/Entradas/EntradaForm");
+        Navigation.NavigateTo("/Entradas/NuevaEntrada");
+    }
+
+    private void AtrasEntrada()
+    {
+        Navigation.NavigateTo("/Dashboards/Dashboard");
     }
 
     private async Task EliminarEntrada(int id)

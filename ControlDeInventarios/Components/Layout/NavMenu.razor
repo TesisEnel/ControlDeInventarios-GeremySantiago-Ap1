@@ -3,70 +3,63 @@
 @inject CustomAuthProvider CustomAuth
 @inject ProductosService productoService
 
-<AuthorizeView>
-    <Authorized Context="auth">
-        <div class="sidebar">
-            <nav class="nav flex-column p-3 bg-light min-vh-100">
-                <h5 class="mb-4">Menú</h5>
 
-                <NavLink class="nav-link" href="/Dashboards/Dashboard" Match="NavLinkMatch.All">
-                    <i class="oi oi-home"></i> Dashboard
-                </NavLink>
 
-                <NavLink class="nav-link" href="/Productos/ProductosList">
-                    <i class="oi oi-box"></i> Productos
-                </NavLink>
+<div class="sidebar bg-light border-end d-flex flex-column p-3" style="width: 220px; height: 100vh; position: fixed;">
+	<h5 class="text-center mb-4">Menú</h5>
 
-                <NavLink class="nav-link" href="/Categorias/CategoriasList">
-                    <i class="oi oi-tags"></i> Categorías
-                </NavLink>
+	<NavLink class="nav-link" href="/Dashboards/Dashboard" Match="NavLinkMatch.All">
+		<i class="bi bi-speedometer2 me-2"></i> Dashboard
+	</NavLink>
 
-                <NavLink class="nav-link" href="/Entradas/EntradasList">
-                    <i class="oi oi-arrow-thick-bottom"></i> Entradas
-                </NavLink>
+	<NavLink class="nav-link" href="/Productos/ProductosList">
+		<i class="bi bi-box me-2"></i> Productos
+	</NavLink>
 
-                <NavLink class="nav-link" href="/Salidas/SalidasList">
-                    <i class="oi oi-arrow-thick-top"></i> Salidas
-                </NavLink>
+	<NavLink class="nav-link" href="/Categorias/CategoriasList">
+		<i class="bi bi-tags me-2"></i> Categorías
+	</NavLink>
 
-                <NavLink class="nav-link" href="/Productos/AlertaStock">
-                    <i class="oi oi-warning"></i> Alerta Stock (@bajoStockCount)
-                </NavLink>
+	<NavLink class="nav-link" href="/Entradas/EntradasList">
+		<i class="bi bi-box-arrow-in-down me-2"></i> Entradas
+	</NavLink>
 
-                <NavLink class="nav-link" href="/PerfilyConfiguracion/PerfilUsuario">
-                    <i class="oi oi-person"></i> Mi Perfil
-                </NavLink>
+	<NavLink class="nav-link" href="/Salidas/SalidasList">
+		<i class="bi bi-box-arrow-up me-2"></i> Salidas
+	</NavLink>
 
-                @if (auth.User.IsInRole("Admin"))
-                {
-                    <NavLink class="nav-link" href="/Usuarios/UsuariosList">
-                        <i class="oi oi-people"></i> Usuarios
-                    </NavLink>
-                }
+	<NavLink class="nav-link" href="/Productos/AlertaStock">
+		<i class="bi bi-exclamation-triangle me-2"></i> Alerta Stock (@bajoStockCount)
+	</NavLink>
 
-                <button class="btn btn-outline-danger mt-4" @onclick="CerrarSesion">
-                    <i class="oi oi-account-logout"></i> Cerrar sesión
-                </button>
-            </nav>
-        </div>
-    </Authorized>
-</AuthorizeView>
+	<NavLink class="nav-link" href="/PerfilyConfiguracion/PerfilUsuario">
+		<i class="bi bi-person-circle me-2"></i> Mi Perfil
+	</NavLink>
+
+
+	<button class="btn btn-outline-danger w-100 mt-auto" @onclick="CerrarSesion">
+		<i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
+	</button>
+</div>
+
+
 
 @code {
-    private int bajoStockCount = 0;
+	private int bajoStockCount = 0;
 
-    protected override async Task OnInitializedAsync()
-    {
-        var productos = await productoService.ObtenerTodosAsync();
-        bajoStockCount = productos.Count(p => p.Stock <= 5);
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		var productos = await productoService.ObtenerTodosAsync();
+		bajoStockCount = productos.Count(p => p.Stock <= 5);
+	}
 
-    private void CerrarSesion()
-    {
-        CustomAuth.CerrarSesion();
-        Navigation.NavigateTo("/Autenticacion/Login", true);
-    }
+	private void CerrarSesion()
+	{
+		CustomAuth.CerrarSesion();
+		Navigation.NavigateTo("/Autenticacion/Login", true);
+	}
 }
+
 
 
 

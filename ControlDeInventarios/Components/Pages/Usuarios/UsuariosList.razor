@@ -4,14 +4,15 @@
 @inject IJSRuntime JS
 @using System.ComponentModel.DataAnnotations
 
-<div class="d-flex justify-content-center mt-5">
-    <div class="bg-white rounded shadow p-4 d-inline-block">
+<div class="d-flex justify-content-center mt-4">
+    <div class="bg-white rounded shadow p-4 w-300" style="max-width: 700px;">
         <h4 class="text-center mb-4">Listado de Usuarios</h4>
 
-        <table class="table table-bordered table-striped m-0">
+        <table class="table table-bordered table-striped w-100 m-0">
             <thead class="table-dark">
                 <tr>
                     <th>Nombre</th>
+                    <th>Apellido</th>
                     <th>Correo</th>
                     <th>Rol</th>
                     <th>Acciones</th>
@@ -22,6 +23,7 @@
                 {
                     <tr>
                         <td>@user.Nombre</td>
+                        <td>@user.Apellido</td>
                         <td>@user.Correo</td>
                         <td>@user.Rol</td>
                         <td>
@@ -36,8 +38,10 @@
 
 
 
+
+
 @code {
-    private List<Usuario> usuarios;
+    private List<Usuario>? usuarios = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -46,11 +50,7 @@
 
     private async Task EliminarUsuario(int id)
     {
-        bool confirmado = await JS.InvokeAsync<bool>("confirm", "¿Estás seguro de eliminar este usuario?");
-        if (confirmado)
-        {
-            await usuarioService.EliminarAsync(id);
-            usuarios = await usuarioService.ObtenerTodosAsync();
-        }
+        await usuarioService.EliminarAsync(id);
+        usuarios = await usuarioService.ObtenerTodosAsync();
     }
 }

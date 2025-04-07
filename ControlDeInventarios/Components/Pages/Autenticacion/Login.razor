@@ -49,10 +49,9 @@
     {
         var usuario = await AuthService.LoginAsync(loginModel.Correo, loginModel.Clave);
 
-        if (usuario != null)
+        if (usuario.EstaAutenticado)
         {
-            // Aquí puedes almacenar usuario en memoria o usar algún mecanismo de sesión
-            AuthProvider.EstablecerUsuario(usuario);
+            await AuthProvider.EstablecerUsuario(usuario);
             Navigation.NavigateTo("/Dashboards/Dashboard", true);
         }
         else
@@ -60,6 +59,7 @@
             errorMessage = "Correo o contraseña incorrectos.";
         }
     }
+
 
     public class LoginModel
     {

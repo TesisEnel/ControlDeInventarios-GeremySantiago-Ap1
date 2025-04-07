@@ -3,7 +3,7 @@
 @inject CategoriaService categoriaService
 @inject NavigationManager Navigation
 @using System.ComponentModel.DataAnnotations
-@*@attribute [Authorize(Roles = "Admin")] // Solo Admin puede *@
+@rendermode InteractiveServer
 @inject IJSRuntime JS
 
 <h3 class="text-center mt-4">@((Id == 0) ? "Agregar Producto" : "Editar Producto")</h3>
@@ -59,7 +59,7 @@
         }
     </div>
 
-    <button type="submit" class="btn btn-success">Guardar</button>
+    <button type="submit" class="btn btn-success ms-2">Guardar</button>
     <button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
 </EditForm>
 

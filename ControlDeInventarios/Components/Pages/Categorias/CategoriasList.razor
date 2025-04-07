@@ -2,8 +2,9 @@
 @inject CategoriaService categoriaService
 @inject NavigationManager Navigation
 @using System.ComponentModel.DataAnnotations
-@*@attribute [Authorize]*@
 @inject IJSRuntime JS
+@rendermode InteractiveServer
+
 
 <h3 class="text-center mt-4">Listado de Categorías</h3>
 
@@ -42,6 +43,7 @@ else
 }
 
 <button class="btn btn-primary mt-3" @onclick="NuevaCategoria">Agregar Categoría</button>
+<button class="btn btn-secondary mt-3" @onclick="AtrasCategoria">Salir de Categoria</button>
 
 @code {
     private List<Categorias> categorias;
@@ -53,12 +55,17 @@ else
 
     private void NuevaCategoria()
     {
-        Navigation.NavigateTo("/Categorias/CategoriaForm");
+        Navigation.NavigateTo("/Categorias/CategoriaForm/0");
+    }
+
+    private void AtrasCategoria()
+    {
+        Navigation.NavigateTo("/Dashboards/Dashboard");
     }
 
     private void EditarCategoria(int id)
     {
-        Navigation.NavigateTo($"/CategoriaForm/{id}");
+        Navigation.NavigateTo($"/Categorias/CategoriaForm/{id}");
     }
 
     private async Task EliminarCategoria(int id)
