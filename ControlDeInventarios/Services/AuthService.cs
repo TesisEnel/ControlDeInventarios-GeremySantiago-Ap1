@@ -16,7 +16,7 @@ namespace ControlDeInventarios.Services
         public async Task<Auth> LoginAsync(string correo, string clave)
         {
             var usuario = await _context.Usuario
-                .FirstOrDefaultAsync(u => u.Correo == correo && u.Clave == clave);
+                .FirstOrDefaultAsync(u => u.Correo == correo.Trim() && u.Clave == clave.Trim());
 
             if (usuario == null)
                 return new Auth { EstaAutenticado = false };
